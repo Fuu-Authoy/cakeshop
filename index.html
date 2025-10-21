@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🍰 Tiệm Bánh Ngọt</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="auth-container">
+    <h1 class="title">🍰 Tiệm Bánh Ngọt</h1>
+
+    <div class="tab-container">
+      <button id="login-tab" class="active">Đăng nhập</button>
+      <button id="register-tab">Đăng ký</button>
+    </div>
+
+    <form id="login-form" class="form active">
+      <input id="login-username" type="text" placeholder="Tên đăng nhập" required>
+      <input id="login-password" type="password" placeholder="Mật khẩu" required>
+      <button type="submit">Đăng nhập</button>
+    </form>
+
+    <form id="register-form" class="form">
+      <input id="register-username" type="text" placeholder="Tên đăng nhập" required>
+      <input id="register-email" type="email" placeholder="Email" required>
+      <input id="register-password" type="password" placeholder="Mật khẩu" required>
+      <button type="submit">Đăng ký</button>
+    </form>
+
+    <p id="message"></p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
