@@ -5,38 +5,124 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Trang chủ | Tiệm Bánh</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Một vài style nhỏ bổ sung cho card / form */
+    .top-controls { display:flex; gap:12px; align-items:center; margin:18px 40px; }
+    .search-input { padding:8px 12px; border-radius:8px; border:1px solid #dbeafe; width:280px; }
+    .select-type { padding:8px 12px; border-radius:8px; border:1px solid #dbeafe; }
+    .btn { padding:8px 12px; border-radius:8px; cursor:pointer; border:none; background:#6dacf3; color:white; }
+    .btn.ghost { background:transparent; color:#333; border:1px solid #ddd; }
+    .cake-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:20px; padding:20px 40px; }
+    .cake-card { background:white; border-radius:12px; overflow:hidden; box-shadow:0 6px 18px rgba(0,0,0,0.06); }
+    .cake-card img { width:100%; height:160px; object-fit:cover; display:block; }
+    .cake-body { padding:12px; }
+    .cake-title { font-size:15px; margin:0 0 6px; }
+    .cake-meta { font-size:13px; color:#666; margin-bottom:8px; }
+    .cake-actions { display:flex; gap:8px; }
+    .small { font-size:13px; padding:6px 8px; border-radius:8px; cursor:pointer; }
+    .small.edit { background:#f0b27a; color:white; border:none; }
+    .small.delete { background:#e74c3c; color:white; border:none; }
+    .small.detail { background:#6dacf3; color:white; border:none; }
+
+    .panel { padding:18px 24px; margin:16px 40px; background:#fff; border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,0.03); }
+    .cake-form { display:flex; flex-direction:column; gap:8px; max-width:720px; }
+    .cake-form input, .cake-form textarea, .cake-form select { padding:8px 10px; border-radius:8px; border:1px solid #e6eef6; }
+    .muted { color:#6b7280; font-size:13px; }
+
+    /* modal */
+    .modal { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.4); z-index:40; }
+    .modal-card { background:white; width:90%; max-width:720px; border-radius:12px; overflow:hidden; }
+    .modal-body { padding:16px; }
+    .hide { display:none; }
+
+    .right { margin-left:auto; }
+    .flex { display:flex; gap:10px; align-items:center; }
+  </style>
 </head>
-<body>
+<body class="home-page">
   <header>
-    <h2>🍰 Tiệm Bánh Ngọt</h2>
+    <h1>🍰 Tiệm Bánh Ngọt</h1>
     <div class="user-info">
       <span id="welcome"></span>
-      <button id="logoutBtn">Đăng xuất</button>
+      <button id="logoutBtn" class="btn ghost">Đăng xuất</button>
     </div>
   </header>
 
   <section class="banner">
-    <img src="img/banner.jpg" alt="Banner Tiệm Bánh">
+    <img src="1.jpg" alt="Banner Tiệm Bánh" style="max-height:260px; width:100%; object-fit:cover;">
     <h3>Ngọt ngào mỗi ngày cùng Tiệm Bánh</h3>
   </section>
 
-  <nav class="menu">
-    <a href="#">Trang chủ</a>
-    <a href="#">Bánh mới</a>
-    <a href="#">Ưu đãi</a>
-    <a href="#">Liên hệ</a>
+  <nav style="padding:12px 40px; display:flex; gap:10px; align-items:center;">
+    <a href="#" id="nav-home">Trang chủ</a>
+    <a href="#" id="nav-cakes">Bánh ngọt</a>
+    <a href="#" id="nav-profile">Khách thân thiết</a>
+    <a href="#" id="nav-contact">Liên hệ</a>
+    <a href="#" id="nav-store">Cửa hàng</a>
+    <a href="#" id="nav-news">Tin tức</a>
   </nav>
 
-  <section class="products">
+  <div class="top-controls">
+    <input id="searchInput" class="search-input" placeholder="Tìm theo tên, mô tả hoặc loại...">
+    <select id="typeFilter" class="select-type">
+      <option value="">Tất cả loại</option>
+    </select>
+    <button id="btnSearch" class="btn">Tìm</button>
+
+    <div class="right">
+      <button id="btnMyCakes" class="btn ghost">Bánh của tôi</button>
+      <button id="btnCreate" class="btn">Tạo bánh mới</button>
+    </div>
+  </div>
+
+  <section class="panel">
     <h3>Danh sách sản phẩm</h3>
-    <div class="product-list" id="productList"></div>
+    <div id="cakesContainer" class="cake-grid">
+      <!-- Cards render bởi JS -->
+    </div>
   </section>
 
-  <section class="profile">
+  <section class="panel profile" id="profilePanel" style="display:none; margin-top:0;">
     <h3>Thông tin người dùng</h3>
     <p>Email: <span id="emailInfo"></span></p>
     <p>Ngày tạo tài khoản: <span id="createdAtInfo"></span></p>
+    <p class="muted">Bạn có thể tạo, chỉnh sửa, xóa bánh khi đã đăng nhập.</p>
   </section>
+
+  <!-- Form thêm / chỉnh sửa bánh (modal) -->
+  <div id="modalCreate" class="modal hide">
+    <div class="modal-card">
+      <div class="modal-body">
+        <h3 id="modalTitle">Tạo bánh mới</h3>
+        <form id="cakeForm" class="cake-form">
+          <input type="text" id="cakeName" placeholder="Tên bánh" required>
+          <textarea id="cakeDesc" rows="3" placeholder="Mô tả"></textarea>
+          <input type="number" id="cakePrice" placeholder="Giá (VNĐ)" required min="0">
+          <select id="cakeType" required></select>
+          <select id="cakeImage" required>
+            <!-- options image -->
+          </select>
+          <div style="display:flex; gap:10px; margin-top:8px;">
+            <button type="submit" class="btn">Lưu</button>
+            <button type="button" id="cancelCreate" class="btn ghost">Hủy</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal detail -->
+  <div id="modalDetail" class="modal hide">
+    <div class="modal-card">
+      <div class="modal-body" id="detailBody">
+        <!-- content by JS -->
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>© Tiệm Bánh - ngọt ngào &amp; ấm áp</p>
+  </footer>
 
   <script src="script.js"></script>
 </body>
